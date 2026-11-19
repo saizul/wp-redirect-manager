@@ -1,0 +1,63 @@
+{
+    "name": "saizul/wp-redirect-manager",
+    "description": "Redirect Manager: lightweight 301/302/307/308/410 redirects for WordPress with exact, prefix and regex matching, a 404 monitor, automatic redirects for changed post URLs, CSV import/export, loop detection and WP-CLI.",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "keywords": [
+        "wordpress",
+        "redirects",
+        "301-redirect",
+        "404",
+        "seo",
+        "regex",
+        "csv",
+        "wp-cli"
+    ],
+    "homepage": "https://github.com/saizul/wp-redirect-manager",
+    "authors": [
+        {
+            "name": "Saizul Amin",
+            "homepage": "https://saizul.com"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/saizul/wp-redirect-manager/issues",
+        "source": "https://github.com/saizul/wp-redirect-manager"
+    },
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "phpcompatibility/phpcompatibility-wp": "^2.1",
+        "phpunit/phpunit": "^9.6",
+        "squizlabs/php_codesniffer": "^3.9",
+        "wp-coding-standards/wpcs": "^3.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Saizul\\RedirectManager\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Saizul\\RedirectManager\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "lint": "find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
+        "phpcs": "phpcs",
+        "phpcbf": "phpcbf",
+        "make-pot": "php bin/make-pot.php"
+    },
+    "config": {
+        "sort-packages": true,
+        "platform": {
+            "php": "7.4.33"
+        },
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}

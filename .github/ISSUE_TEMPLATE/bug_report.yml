@@ -1,0 +1,38 @@
+name: Bug report
+description: A redirect does not match, matches the wrong URL, loops, or the plugin does not work as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please remove private URLs, and never post passwords or tokens.
+        Security problems go to the private "Report a vulnerability" form instead.
+  - type: textarea
+    id: rule
+    attributes:
+      label: The redirect
+      description: Source, target, status, match type (exact, prefix, regex) and query string mode.
+      placeholder: |
+        Source: /old-blog
+        Target: /blog
+        Status: 301, prefix, pass
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Requested URL, what you expected and what you got. Output of `wp redirects test <url>` or `curl -I <url>` helps a lot.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: WordPress, PHP and plugin versions, database, caching plugin or CDN, single site or multisite, permalink structure.
+      placeholder: |
+        WordPress 7.0, PHP 8.3, MariaDB 10.11, Redirect Manager 0.1.0
+        Cache / CDN: ...
+        Permalinks: /%postname%/
+    validations:
+      required: true

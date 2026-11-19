@@ -1,0 +1,13 @@
+# Sample import file for Redirect Manager.
+# Columns: source,target,status,match_type,query,enabled,note
+# Only source and target are required; lines starting with # are ignored.
+source,target,status,match_type,query,enabled,note
+/old-page,/new-page,301,exact,ignore,1,Renamed page
+/About-Us/,/about/,301,exact,ignore,1,Case and trailing slash do not matter
+/index.php?page_id=12,/contact/,301,exact,exact,1,Old ugly permalink
+/old-blog,/blog,301,prefix,pass,1,Whole folder moved; /old-blog/a/b goes to /blog/a/b
+"^/(\d{4})/(\d{2})/(.+)$",/news/$3,308,regex,ignore,1,Date-based archive URLs
+^/tag/(.*)$,/topic/$1,301,regex,ignore,0,Disabled until the topics go live
+/summer-sale,/shop/?campaign=summer,302,exact,pass,1,Temporary
+/discontinued-product,,410,exact,ignore,1,Gone for good
+/partner,https://partner.example.com/landing,301,exact,ignore,1,External target

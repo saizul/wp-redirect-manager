@@ -1,0 +1,108 @@
+name: Release zip
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  SLUG: wp-redirect-manager
+
+jobs:
+  zip:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          coverage: none
+
+      - name: Check the version matches the tag
+        if: github.event_name == 'release'
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          header=$(sed -n 's/^ \* Version: *//p' "$SLUG.php" | tr -d '[:space:]')
+          define=$(sed -n "s/^define( 'WP_REDIRECT_MANAGER_VERSION', '\(.*\)' );/\1/p" "$SLUG.php" | tr -d '[:space:]')
+          constant=$(sed -n "s/^.*const VERSION *= '\(.*\)';/\1/p" src/Plugin.php | tr -d '[:space:]')
+          stable=$(sed -n 's/^Stable tag: *//p' readme.txt | tr -d '[:space:]')
+          echo "tag=$tag header=$header define=$define constant=$constant stable=$stable"
+          test "$tag" = "$header"
+          test "$tag" = "$define"
+          test "$tag" = "$constant"
+          test "$tag" = "$stable"
+
+      - name: Build the plugin folder
+        run: |
+          mkdir -p "build/$SLUG"
+          rsync -a --exclude-from=.distignore ./ "build/$SLUG/"
+          # The plugin has no runtime Composer dependencies and no JavaScript build step.
+          test ! -e "build/$SLUG/vendor"
+          test ! -e "build/$SLUG/tests"
+          test ! -e "build/$SLUG/bin"
+          test ! -e "build/$SLUG/examples"
+          test -e "build/$SLUG/$SLUG.php"
+          test -e "build/$SLUG/uninstall.php"
+          test -e "build/$SLUG/src/Plugin.php"
+          test -e "build/$SLUG/src/Matcher.php"
+          test -e "build/$SLUG/src/Admin/AdminPage.php"
+          test -e "build/$SLUG/src/Store/DbRuleStore.php"
+          test -e "build/$SLUG/src/Cli/Command.php"
+          test -e "build/$SLUG/languages/$SLUG.pot"
+          test -e "build/$SLUG/readme.txt"
+          test -e "build/$SLUG/LICENSE"
+          find "build/$SLUG" -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null
+          find "build/$SLUG" -type f | sort
+
+      - name: Smoke test the autoloader, matcher, loop detector and CSV parser
+        run: |
+          php -r '
+            define("ABSPATH", __DIR__);
+            function __($t, $d = "default") { return $t; }
+            spl_autoload_register(function ($c) {
+              $prefix = "Saizul\\RedirectManager\\";
+              if (strpos($c, $prefix) === 0) { require "build/wp-redirect-manager/src/" . str_replace("\\", "/", substr($c, strlen($prefix))) . ".php"; }
+            });
+            use Saizul\RedirectManager\{Csv, Index, LoopDetector, Matcher, Rule};
+            $rules = array(
+              Rule::from_array(array("id" => 1, "source" => "/old/", "target" => "/new")),
+              Rule::from_array(array("id" => 2, "source" => "^/blog/(\\d+)$", "target" => "/p/$1", "match_type" => "regex")),
+              Rule::from_array(array("id" => 3, "source" => "/shop", "target" => "/store", "match_type" => "prefix", "query" => "pass")),
+            );
+            $index = Index::build($rules);
+            $loop  = Rule::from_array(array("id" => 4, "source" => "/new", "target" => "/old"));
+            $index->add($loop);
+            $check = (new LoopDetector(array("example.org")))->check($loop, $index);
+            $csv   = Csv::parse("source,target,status\n/a,/b,302\n");
+            $ok = "/new" === Matcher::match($index, "/OLD?x=1")->url
+              && "/p/42" === Matcher::match($index, "/blog/42")->url
+              && "/store/shoes?c=red" === Matcher::match($index, "/shop/shoes?c=red")->url
+              && LoopDetector::LOOP === $check["result"]
+              && "302" === $csv["rows"][2]["status"];
+            exit($ok ? 0 : 1);
+          '
+
+      - name: Create the zip
+        run: |
+          cd build
+          zip -r -q "../$SLUG.zip" "$SLUG"
+          cd ..
+          unzip -l "$SLUG.zip" | tail -n 1
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.SLUG }}
+          path: ${{ env.SLUG }}.zip
+
+      - name: Attach to the release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "$GITHUB_REF_NAME" "$SLUG.zip" --clobber
