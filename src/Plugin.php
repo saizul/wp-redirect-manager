@@ -9,6 +9,7 @@ namespace Saizul\RedirectManager;
 
 use Saizul\RedirectManager\Admin\AdminPage;
 use Saizul\RedirectManager\Cli\Command;
+use Saizul\RedirectManager\Cli\NotFoundCommand;
 use Saizul\RedirectManager\Store\DbNotFoundStore;
 use Saizul\RedirectManager\Store\DbRuleStore;
 use Saizul\RedirectManager\Store\NotFoundStore;
@@ -113,6 +114,7 @@ final class Plugin {
 		}
 		if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( '\WP_CLI' ) ) {
 			\WP_CLI::add_command( 'redirects', new Command( $this ) );
+			\WP_CLI::add_command( 'redirects 404', new NotFoundCommand( $this ) );
 		}
 	}
 

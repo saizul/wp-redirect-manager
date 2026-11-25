@@ -60,7 +60,7 @@ Plugin slug: `wp-redirect-manager` - display name: *Redirect Manager*.
   re-pointed, so there are no chains.
 - **CSV import/export** with a documented column order, optional header row,
   dry run, update-or-skip of existing rules and per-line error report.
-- **WP-CLI**: `wp redirects add | list | import | export | delete | test`.
+- **WP-CLI**: `wp redirects add | list | import | export | delete | test` and `wp redirects 404 list | clear`.
 - **Loop and chain detection** on save, on enable and on import, plus a
   runtime guard against redirecting a URL to itself.
 - Nonces and capability checks everywhere, sanitised input, escaped output,
@@ -237,6 +237,12 @@ wp redirects test '/old-blog/2024/post?utm_source=mail'
 
 # Delete
 wp redirects delete 12 13
+
+# 404 log (table, csv, json, yaml, count, ids; --limit=0 for all)
+wp redirects 404 list
+wp redirects 404 list --orderby=hits --limit=20 --format=csv
+wp redirects 404 list --search=/shop --fields=url,hits,referrer,user_agent
+wp redirects 404 clear --yes
 ```
 
 Errors (invalid input, loops) exit with status 1 and a message, so the
@@ -358,6 +364,7 @@ src/Schema.php                Custom tables (dbDelta)
 src/Store/                    Storage contracts and database implementations
 src/Admin/                    Tools > Redirects screen and list tables
 src/Cli/Command.php           wp redirects
+src/Cli/NotFoundCommand.php   wp redirects 404
 tests/                        PHPUnit tests, WordPress and WP-CLI stubs
 bin/make-pot.php              POT generator
 examples/                     Sample CSV and developer snippets
@@ -380,7 +387,6 @@ well scoped; see [CONTRIBUTING.md](CONTRIBUTING.md#good-first-issues).
 
 - "Test a URL" box on the Redirects tab (uses `Redirects::resolve()`) - **good first issue**
 - Filter the list by status, match type and enabled state (dropdowns) - **good first issue**
-- `wp redirects 404 list|clear` subcommands - **good first issue**
 - Export the 404 log as CSV - **good first issue**
 - Screen option for rows per page - **good first issue**
 - `--format=json` for `wp redirects test` - **good first issue**

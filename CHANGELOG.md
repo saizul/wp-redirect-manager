@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `wp redirects 404 list` (search, `--orderby=last_seen|first_seen|hits|url`, `--order`,
+  `--limit` with 0 for all, `--fields`, `--format`) and `wp redirects 404 clear` (asks for
+  confirmation unless `--yes`).
+
 ## [0.1.0] - 2026-11-19
 
 ### Added

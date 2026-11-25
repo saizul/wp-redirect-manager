@@ -36,7 +36,7 @@ Redirect Manager keeps old URLs working without slowing your site down. Redirect
 **Import, export and WP-CLI**
 
 * CSV import and export with a documented column order: source,target,status,match_type,query,enabled,note. Header row optional, dry run, per-line error report.
-* wp redirects add, list, import, export, delete and test.
+* wp redirects add, list, import, export, delete and test, plus wp redirects 404 list and clear.
 
 == Installation ==
 
