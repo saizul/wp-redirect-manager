@@ -36,24 +36,20 @@ in `tests/Unit/`.
    already accepts `status`, `match_type` and `enabled`; add the dropdowns
    with `RedirectsTable::extra_tablenav()` and keep the values in the
    pagination links.
-3. **`wp redirects 404 list` and `wp redirects 404 clear`.** New
-   subcommands in `src/Cli/Command.php` using `NotFoundStore::query()` and
-   `clear()`, with `--format` support. Add tests to `tests/Unit/CliTest.php`
-   and document them in the README.
-4. **Export the 404 log as CSV.** A button on the 404 tab (nonce +
+3. **Export the 404 log as CSV.** A button on the 404 tab (nonce +
    capability, like `handle_export()`), columns `url,hits,referrer,user_agent,first_seen,last_seen`.
    Reuse `Csv::cell()` against formula injection.
-5. **Screen option for rows per page.** Register `redirect_manager_per_page`
+4. **Screen option for rows per page.** Register `redirect_manager_per_page`
    with `add_screen_option()` on the `load-` hook and save it with the
    `set_screen_option_redirect_manager_per_page` filter.
-6. **`--format=json` for `wp redirects test`.** Print `status`, `url`,
+5. **`--format=json` for `wp redirects test`.** Print `status`, `url`,
    `rule_id` and `match_type` as JSON; keep the current text output as the
    default.
-7. **Warn about regex sources without `^`.** In `Sanitizer::rule()` nothing
+6. **Warn about regex sources without `^`.** In `Sanitizer::rule()` nothing
    changes, but `AdminPage` shows a notice after saving a regex rule whose
    pattern does not start with `^`, because unanchored patterns match more
    than people expect.
-8. **Translate the plugin into your language** with Poedit or Loco Translate
+7. **Translate the plugin into your language** with Poedit or Loco Translate
    from `languages/wp-redirect-manager.pot`, and open a PR with the `.po`
    file.
 
